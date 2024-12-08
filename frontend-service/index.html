@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Funto - HTML NFT Marketplace" />
+    <!-- Title-->
+    <title>Funto - HTML NFT Marketplace</title>
+    <!-- Favicon-->
+    <link
+      rel="shortcut icon"
+      href="img/core-img/favicon.ico"
+      type="image/x-icon"
+    />
+    <!-- All CSS Stylesheet-->
+    <link rel="stylesheet" href="css/all-css-libraries.css" />
+    <!-- Core Stylesheet-->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Include web3.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <!-- Include axios from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Link to external JavaScript file -->
+    <script src="blockchain/wallet.js" defer></script>
+    <script src="blockchain/fetchUnsoldNFTs.js" defer></script>
+  </head>
+  <body>
+    <!-- Preloader-->
+    <div class="preloader" id="preloader">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <!-- Header Area-->
+    <header class="header-area">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <!-- Navbar Brand --><a class="navbar-brand" href="index.html"
+            ><img class="light-logo" src="img/core-img/logo.png" alt="" /><img
+              class="dark-logo"
+              src="img/core-img/logo-white.png"
+              alt=""
+          /></a>
+          <!-- Navbar Toggler -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#funtoNav"
+            aria-controls="funtoNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <i class="bi bi-grid"></i>
+          </button>
+          <!-- Navbar -->
+          <div class="collapse navbar-collapse" id="funtoNav">
+            <ul class="navbar-nav navbar-nav-scroll my-2 my-lg-0">
+              <li>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <a href="create-new.html">Create</a>
+              </li>
+              <li>
+                <a href="my-nft.html">My NFT</a>
+              </li>
+            </ul>
+            <!-- Connect to wallet button -->
+            <!-- Connect to wallet button -->
+            <div class="header-meta d-flex align-items-center ms-lg-auto">
+              <span
+                class="wallet-address text-white p-2"
+                id="walletAddress"
+              ></span>
+              <a class="btn btn-warning btn-sm rounded-pill" id="walletButton"
+                >Connect to wallet</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!-- Welcome Wrapper  -->
+    <div class="welcome-area pt-120">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Welcome Content -->
+          <div class="col-12 col-sm-10 col-md-6">
+            <div class="welcome-content mb-5 mb-md-0">
+              <h2
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay="500"
+              >
+                Explore, buy, and sell exceptional NFTs.
+              </h2>
+              <p
+                class="mb-4"
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay="800"
+              >
+                It's crafted with the latest trend of design &amp; coded with
+                all modern approaches.
+              </p>
+              <div
+                class="hero-btn-group"
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay="1200"
+              >
+                <a class="btn btn-primary rounded-pill mt-3 me-3" href="#explpr"
+                  >Explore Now<i class="ms-2 bi bi-arrow-right"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+          <!-- Welcome Thumb -->
+          <div class="col-12 col-sm-9 col-md-6">
+            <div
+              class="welcome-thumb"
+              data-aos="fade-up"
+              data-aos-duration="750"
+              data-aos-delay="500"
+            >
+              <img src="img/illustrator/2.png" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="divider" id="explpr"></div>
+
+    <div class="discover-nft-wrapper">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-12 col-md-4">
+            <div class="section-heading">
+              <h2 class="mb-0">Discover</h2>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div
+              class="filters-button-group d-flex justify-content-md-end flex-wrap"
+            >
+              <button
+                class="btn btn-outline-primary rounded-pill border-2 btn-sm mb-3 mx-2 active"
+                type="button"
+                data-filter="*"
+              >
+                <i class="fz-16 bi bi-collection"></i>All
+              </button>
+              <button
+                class="btn btn-outline-primary rounded-pill border-2 btn-sm mb-3 mx-2"
+                type="button"
+                data-filter=".art"
+              >
+                <i class="fz-16 bi bi-palette"></i>Art
+              </button>
+              <button
+                class="btn btn-outline-primary rounded-pill border-2 btn-sm mb-3 mx-2"
+                type="button"
+                data-filter=".cards"
+              >
+                <i class="fz-16 bi bi-card-image"></i>Cards
+              </button>
+              <button
+                class="btn btn-outline-primary rounded-pill border-2 btn-sm mb-3 mx-2"
+                type="button"
+                data-filter=".collectibles"
+              >
+                <i class="fz-16 bi bi-list-stars"></i>Collectibles
+              </button>
+              <button
+                class="btn btn-outline-primary rounded-pill border-2 btn-sm mb-3 mx-2"
+                type="button"
+                data-filter=".photos"
+              >
+                <i class="fz-16 bi bi-image"></i>Photos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ====================== -->
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div id="nft-list" class="row g-4">
+              <!-- Dynamic NFT cards will be rendered here -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ====================== -->
+    </div>
+
+    <div class="divider"></div>
+    <div
+      class="process-wrapper"
+      data-aos="zoom-in"
+      data-aos-duration="500"
+      data-aos-delay="200"
+    >
+      <div class="container">
+        <div class="row g-4 g-xxl-5 align-items-center justify-content-center">
+          <div class="col-12 col-sm-6 col-xl-3">
+            <!-- Single Card-->
+            <div
+              class="single-process-card card bg-gray border-0"
+              data-aos="fade-up"
+              data-aos-duration="750"
+              data-aos-delay="400"
+            >
+              <div class="card-body p-4 text-center">
+                <img class="mb-3 mx-auto" src="img/illustrator/4.png" alt="" />
+                <h5 class="mb-3">Create your account &amp; add wallet</h5>
+                <p class="mb-0">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                </p>
+              </div>
+              <!-- Step -->
+              <div class="step-number">1</div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <!-- Single Card-->
+            <div
+              class="single-process-card card bg-gray border-0"
+              data-aos="fade-up"
+              data-aos-duration="750"
+              data-aos-delay="600"
+            >
+              <div class="card-body p-4 text-center">
+                <img class="mb-3 mx-auto" src="img/illustrator/2.png" alt="" />
+                <h5 class="mb-3">Get approval from our review team</h5>
+                <p class="mb-0">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                </p>
+              </div>
+              <!-- Step -->
+              <div class="step-number">2</div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <!-- Single Card-->
+            <div
+              class="single-process-card card bg-gray border-0"
+              data-aos="fade-up"
+              data-aos-duration="750"
+              data-aos-delay="800"
+            >
+              <div class="card-body p-4 text-center">
+                <img class="mb-3 mx-auto" src="img/illustrator/3.png" alt="" />
+                <h5 class="mb-3">Create your NFT's &amp; list them for sale</h5>
+                <p class="mb-0">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                </p>
+              </div>
+              <!-- Step -->
+              <div class="step-number">3</div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <!-- Single Card-->
+            <div
+              class="single-process-card card bg-gray border-0"
+              data-aos="fade-up"
+              data-aos-duration="750"
+              data-aos-delay="1000"
+            >
+              <div class="card-body p-4 text-center">
+                <img class="mb-3 mx-auto" src="img/illustrator/1.png" alt="" />
+                <h5 class="mb-3">Now sale your items &amp; earn rewards</h5>
+                <p class="mb-0">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                </p>
+              </div>
+              <!-- Step -->
+              <div class="step-number">4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark Light Wrapper -->
+    <div
+      class="dark-light-wrapper"
+      data-aos="zoom-in"
+      style="margin-top: 50px"
+      data-aos-duration="750"
+      data-aos-delay="200"
+    >
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <h5
+            class="mb-0 text-white"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="500"
+          >
+            Light mode is available!
+          </h5>
+          <!-- Switch -->
+          <div
+            class="dark-light-mode"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="800"
+          >
+            <input id="darkLightSwitch" type="checkbox" />
+            <label class="shadow" for="darkLightSwitch">Toggle</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer-area text-center py-4">
+      <div class="container">
+        <p>&copy; <span id="year"></span> My NFT Marketplace.</p>
+      </div>
+    </footer>
+    <!-- Scroll To Top -->
+    <div id="scrollTopButton"><i class="bi bi-arrow-up-short"></i></div>
+    <!-- All JavaScript Files-->
+    <script src="js/all-js-libraries.js"></script>
+    <script src="js/active.js"></script>
+    <script src="js/charts.js"></script>
+  </body>
+</html>

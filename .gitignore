@@ -1,0 +1,4 @@
+blockchain-service/node_modules
+blockchain-service/.env
+blockchain-service/artifacts
+blockchain-service/cache

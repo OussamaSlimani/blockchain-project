@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Funto - HTML NFT Marketplace" />
+    <!-- Title-->
+    <title>Funto - HTML NFT Marketplace</title>
+    <!-- Favicon-->
+    <link
+      rel="shortcut icon"
+      href="img/core-img/favicon.ico"
+      type="image/x-icon"
+    />
+    <!-- All CSS Stylesheet-->
+    <link rel="stylesheet" href="css/all-css-libraries.css" />
+    <!-- Core Stylesheet-->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Include web3.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <!-- Include axios from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Link to external JavaScript file -->
+    <script src="blockchain/wallet.js" defer></script>
+    <script src="blockchain/fetchMyNFTs.js" defer></script>
+  </head>
+  <body>
+    <!-- Preloader-->
+    <div class="preloader" id="preloader">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <!-- Header Area-->
+    <header class="header-area">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <!-- Navbar Brand --><a class="navbar-brand" href="index.html"
+            ><img class="light-logo" src="img/core-img/logo.png" alt="" /><img
+              class="dark-logo"
+              src="img/core-img/logo-white.png"
+              alt=""
+          /></a>
+          <!-- Navbar Toggler -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#funtoNav"
+            aria-controls="funtoNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <i class="bi bi-grid"></i>
+          </button>
+          <!-- Navbar -->
+          <div class="collapse navbar-collapse" id="funtoNav">
+            <ul class="navbar-nav navbar-nav-scroll my-2 my-lg-0">
+              <li>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <a href="create-new.html">Create</a>
+              </li>
+              <li>
+                <a href="my-nft.html">My NFT</a>
+              </li>
+            </ul>
+            <!-- Connect to wallet button -->
+            <!-- Connect to wallet button -->
+            <div class="header-meta d-flex align-items-center ms-lg-auto">
+              <span
+                class="wallet-address text-white p-2"
+                id="walletAddress"
+              ></span>
+              <a class="btn btn-warning btn-sm rounded-pill" id="walletButton"
+                >Connect to wallet</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class="welcome-area pt-120">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-10 col-xl-8">
+            <div class="welcome-content text-center">
+              <h2
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay="300"
+              >
+                Digital arts are trends now. Welcome to the world of NFTs.
+              </h2>
+              <p
+                class="mb-4"
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay="500"
+              >
+                It's crafted with the latest trend of design &amp; coded with
+                all modern approaches. It's a robust &amp; multi-dimensional
+                usable template.
+              </p>
+              <a
+                class="btn btn-primary rounded-pill"
+                href="#explpr"
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay="800"
+                ><i class="me-2 bi bi-grid-3x3-gap"></i>View My NFT</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="divider" id="explpr"></div>
+
+    <div class="discover-nft-wrapper">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-12 col-md-4">
+            <div class="section-heading">
+              <h2 class="mb-0">My NFT</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ======================= -->
+      <div class="container my-5">
+        <div id="nftList" class="row g-4 mt-4"></div>
+        <div id="messageDiv" class="mt-3 text-center"></div>
+      </div>
+      <!-- ======================= -->
+    </div>
+    <div class="divider"></div>
+
+    <!-- Dark Light Wrapper -->
+    <div
+      class="dark-light-wrapper"
+      data-aos="zoom-in"
+      style="margin-top: 50px"
+      data-aos-duration="750"
+      data-aos-delay="200"
+    >
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <h5
+            class="mb-0 text-white"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="500"
+          >
+            Light mode is available!
+          </h5>
+          <!-- Switch -->
+          <div
+            class="dark-light-mode"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="800"
+          >
+            <input id="darkLightSwitch" type="checkbox" />
+            <label class="shadow" for="darkLightSwitch">Toggle</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer-area text-center py-4">
+      <div class="container">
+        <p>&copy; <span id="year"></span> My NFT Marketplace.</p>
+      </div>
+    </footer>
+    <!-- Scroll To Top -->
+    <div id="scrollTopButton"><i class="bi bi-arrow-up-short"></i></div>
+    <!-- All JavaScript Files-->
+    <script src="js/all-js-libraries.js"></script>
+    <script src="js/active.js"></script>
+    <script src="js/charts.js"></script>
+  </body>
+</html>

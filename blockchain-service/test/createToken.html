@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create NFT</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <h1>Create Your NFT</h1>
+
+    <!-- Connect to MetaMask Button -->
+    <button id="connectButton">Connect to MetaMask</button>
+    <p id="accountInfo"></p>
+
+    <!-- NFT Creation Form -->
+    <form id="nftForm">
+      <label for="nftName">NFT Name:</label>
+      <input type="text" id="nftName" name="nftName" required /><br /><br />
+
+      <label for="nftDescription">Description:</label>
+      <textarea id="nftDescription" name="nftDescription" required></textarea>
+      <br /><br />
+
+      <label for="nftCreator">Creator:</label>
+      <input
+        type="text"
+        id="nftCreator"
+        name="nftCreator"
+        required
+      /><br /><br />
+
+      <label for="nftFile">Select Image:</label>
+      <input
+        type="file"
+        id="nftFile"
+        name="nftFile"
+        accept="image/*"
+        required
+      /><br /><br />
+
+      <button type="submit">Create NFT</button>
+    </form>
+
+    <p id="status"></p>
+
+    <script>
+      let userAccount = null;
+      let web3 = null;
+
+      // Connect to MetaMask
+      document
+        .getElementById("connectButton")
+        .addEventListener("click", async () => {
+          if (window.ethereum) {
+            try {
+              const accounts = await ethereum.request({
+                method: "eth_requestAccounts",
+              });
+              userAccount = accounts[0];
+              document.getElementById(
+                "accountInfo"
+              ).innerText = `Connected: ${userAccount}`;
+
+              // Initialize Web3
+              web3 = new Web3(window.ethereum);
+            } catch (error) {
+              console.error("User denied account access", error);
+            }
+          } else {
+            alert(
+              "MetaMask is not installed. Please install it to use this feature."
+            );
+          }
+        });
+
+      // Handle NFT Form Submission
+      document
+        .getElementById("nftForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          if (!userAccount) {
+            alert("Please connect to MetaMask first.");
+            return;
+          }
+
+          const formData = new FormData();
+          const nftName = document.getElementById("nftName").value;
+          const nftDescription =
+            document.getElementById("nftDescription").value;
+          const nftCreator = document.getElementById("nftCreator").value;
+          const nftFile = document.getElementById("nftFile").files[0];
+
+          // Add the file and metadata to the form data
+          formData.append("file", nftFile);
+          formData.append(
+            "metadata",
+            JSON.stringify({
+              name: nftName,
+              description: nftDescription,
+              creator: nftCreator,
+            })
+          );
+
+          // Display status
+          document.getElementById("status").innerText = "Uploading...";
+
+          try {
+            const response = await axios.post(
+              "https://blockchain-tul0.onrender.com/api/marketplace/create-token",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            document.getElementById(
+              "status"
+            ).innerText = `NFT Created! Transaction Hash: ${response.data.transactionHash}`;
+          } catch (error) {
+            console.error(error);
+            document.getElementById("status").innerText =
+              "Error creating NFT. Check console for details.";
+          }
+        });
+    </script>
+  </body>
+</html>

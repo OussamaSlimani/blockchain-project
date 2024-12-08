@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Funto - HTML NFT Marketplace" />
+    <!-- Title-->
+    <title>Funto - HTML NFT Marketplace</title>
+    <!-- Favicon-->
+    <link
+      rel="shortcut icon"
+      href="img/core-img/favicon.ico"
+      type="image/x-icon"
+    />
+    <!-- All CSS Stylesheet-->
+    <link rel="stylesheet" href="css/all-css-libraries.css" />
+    <!-- Core Stylesheet-->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Include web3.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <!-- Include axios from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Link to external JavaScript file -->
+    <script src="blockchain/wallet.js" defer></script>
+    <script src="blockchain/create.js" defer></script>
+  </head>
+  <body>
+    <!-- Preloader-->
+    <div class="preloader" id="preloader">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <!-- Header Area-->
+    <header class="header-area">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <!-- Navbar Brand --><a class="navbar-brand" href="index.html"
+            ><img class="light-logo" src="img/core-img/logo.png" alt="" /><img
+              class="dark-logo"
+              src="img/core-img/logo-white.png"
+              alt=""
+          /></a>
+          <!-- Navbar Toggler -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#funtoNav"
+            aria-controls="funtoNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <i class="bi bi-grid"></i>
+          </button>
+          <!-- Navbar -->
+          <div class="collapse navbar-collapse" id="funtoNav">
+            <ul class="navbar-nav navbar-nav-scroll my-2 my-lg-0">
+              <li>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <a href="create-new.html">Create</a>
+              </li>
+              <li>
+                <a href="my-nft.html">My NFT</a>
+              </li>
+            </ul>
+            <!-- Connect to wallet button -->
+            <!-- Connect to wallet button -->
+            <div class="header-meta d-flex align-items-center ms-lg-auto">
+              <span
+                class="wallet-address text-white p-2"
+                id="walletAddress"
+              ></span>
+              <a class="btn btn-warning btn-sm rounded-pill" id="walletButton"
+                >Connect to wallet</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-wrapper">
+      <div class="container">
+        <div class="breadcrumb-content">
+          <h2 class="breadcrumb-title">Create New</h2>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center">
+              <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Create</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="create-new-wrapper">
+      <div class="container">
+        <div class="row g-5 justify-content-center">
+          <div class="col-12 col-lg-8">
+            <!-- =========== Create New Form  ===========-->
+            <div class="create-new-form border shadow-sm p-4 p-sm-5">
+              <h2 class="mb-4">Create new NFT</h2>
+              <form id="nftForm">
+                <div class="row align-items-center">
+                  <div class="col-12">
+                    <div class="form-group mb-4">
+                      <label class="mb-2 fz-16" for="nftFile"
+                        >Upload Files</label
+                      >
+                      <input
+                        class="form-control bg-transparent"
+                        id="nftFile"
+                        type="file"
+                        accept="image/*"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group mb-4">
+                      <label class="mb-2 fz-16" for="nftName">Title</label>
+                      <input
+                        class="form-control"
+                        id="nftName"
+                        type="text"
+                        placeholder="Macaw Bird"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group mb-4">
+                      <label class="mb-2 fz-16" for="nftDescription"
+                        >Description</label
+                      >
+                      <input
+                        class="form-control"
+                        id="nftDescription"
+                        type="text"
+                        placeholder="Write short description"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group mb-4">
+                      <label class="mb-2 fz-16" for="nftCreator">Creator</label>
+                      <input
+                        class="form-control"
+                        id="nftCreator"
+                        type="text"
+                        placeholder="Creator Name"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <button
+                      class="btn btn-primary rounded-pill w-100"
+                      type="submit"
+                    >
+                      Create NFT
+                    </button>
+                  </div>
+                </div>
+              </form>
+              <p id="status"></p>
+            </div>
+            <!-- =========== Create New Form  ===========-->
+          </div>
+
+          <div class="col-12 col-sm-8 col-lg-4">
+            <div class="list-item cards">
+              <div class="nft-card card shadow-sm">
+                <div class="card-body">
+                  <div class="img-wrap">
+                    <img id="previewImage" src="img/bg-img/13.jpg" alt="" />
+                  </div>
+                  <div class="row gx-2 align-items-center mt-2">
+                    <div class="col-12">
+                      <div class="name-info d-flex align-items-center">
+                        <div class="name-author">
+                          <p
+                            id="cardName"
+                            class="name d-block hover-primary fw-bold text-truncate"
+                          >
+                            Name
+                          </p>
+                          <p
+                            id="cardCreator"
+                            class="author d-block fz-12 hover-primary text-truncate"
+                          >
+                            Creator
+                          </p>
+                          <p
+                            id="cardDescription"
+                            class="author d-block fz-12 hover-primary text-truncate"
+                          >
+                            Description
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h5 class="mb-0 mt-3 text-center">
+              <i class="bi bi-eye me-1"></i>Live Preview
+            </h5>
+          </div>
+
+          <div class="divider"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <!-- Dark Light Wrapper -->
+    <div
+      class="dark-light-wrapper"
+      data-aos="zoom-in"
+      data-aos-duration="750"
+      data-aos-delay="200"
+    >
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <h5
+            class="mb-0 text-white"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="500"
+          >
+            Light mode is available!
+          </h5>
+          <!-- Switch -->
+          <div
+            class="dark-light-mode"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="800"
+          >
+            <input id="darkLightSwitch" type="checkbox" />
+            <label class="shadow" for="darkLightSwitch">Toggle</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer-area text-center py-4">
+      <div class="container">
+        <p>&copy; <span id="year"></span> My NFT Marketplace.</p>
+      </div>
+    </footer>
+
+    <!-- Scroll To Top -->
+    <div id="scrollTopButton"><i class="bi bi-arrow-up-short"></i></div>
+    <!-- All JavaScript Files-->
+    <script src="js/all-js-libraries.js"></script>
+    <script src="js/active.js"></script>
+    <script src="js/charts.js"></script>
+
+    <script>
+      document
+        .getElementById("nftForm")
+        .addEventListener("input", function (e) {
+          // Get values from the form
+          const name = document.getElementById("nftName").value;
+          const description = document.getElementById("nftDescription").value;
+          const creator = document.getElementById("nftCreator").value;
+          const file = document.getElementById("nftFile").files[0];
+
+          // Update the preview card
+          document.getElementById("cardName").textContent = name || "Name";
+          document.getElementById("cardDescription").textContent =
+            description || "Description";
+          document.getElementById("cardCreator").textContent =
+            creator || "Creator";
+
+          // Update the image preview if a file is selected
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              document.getElementById("previewImage").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+    </script>
+  </body>
+</html>

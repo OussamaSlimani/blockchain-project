@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marketplace</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <h1>NFT Marketplace</h1>
+
+    <!-- Connect to MetaMask Button -->
+    <button id="connectButton">Connect to MetaMask</button>
+    <p id="accountInfo"></p>
+
+    <!-- List of Unsold NFTs -->
+    <div id="marketplace"></div>
+
+    <script>
+      let userAccount = null;
+      let web3 = null;
+
+      // Connect to MetaMask
+      document
+        .getElementById("connectButton")
+        .addEventListener("click", async () => {
+          if (window.ethereum) {
+            try {
+              const accounts = await ethereum.request({
+                method: "eth_requestAccounts",
+              });
+              userAccount = accounts[0];
+              document.getElementById(
+                "accountInfo"
+              ).innerText = `Connected: ${userAccount}`;
+
+              // Initialize Web3
+              web3 = new Web3(window.ethereum);
+
+              // Fetch unsold NFTs
+              fetchUnsoldNFTs();
+            } catch (error) {
+              console.error("User denied account access", error);
+            }
+          } else {
+            alert(
+              "MetaMask is not installed. Please install it to use this feature."
+            );
+          }
+        });
+
+      // Fetch unsold NFTs from the backend
+      async function fetchUnsoldNFTs() {
+        try {
+          const response = await axios.get(
+            "https://blockchain-tul0.onrender.com/api/marketplace/unsold-items"
+          );
+
+          if (response.data.success) {
+            const unsoldItems = response.data.unsoldItems;
+            const marketplaceDiv = document.getElementById("marketplace");
+
+            marketplaceDiv.innerHTML = ""; // Clear previous results
+
+            if (unsoldItems.length === 0) {
+              marketplaceDiv.innerHTML = "<p>No NFTs available for sale.</p>";
+            } else {
+              unsoldItems.forEach(async (nft) => {
+                const tokenURIResponse = await axios.get(
+                  `https://blockchain-tul0.onrender.com/api/marketplace/token-uri/${nft.tokenId}`
+                );
+
+                if (tokenURIResponse.data.success) {
+                  const tokenURI = tokenURIResponse.data.tokenURI;
+                  const ipfsUrl = `https://ipfs.io/ipfs/${tokenURI}`;
+
+                  // Fetch NFT metadata from IPFS
+                  const metadata = await axios.get(ipfsUrl);
+                  const nftItem = document.createElement("div");
+
+                  nftItem.innerHTML = `
+                    <p><strong>Token ID:</strong> ${nft.tokenId}</p>
+                    <p><strong>Seller:</strong> ${nft.seller}</p>
+                    <p><strong>Price:</strong> ${nft.price} ETH</p>
+                    <p><strong>Name:</strong> ${metadata.data.name}</p>
+                    <p><strong>Description:</strong> ${metadata.data.description}</p>
+                    <p><strong>Creator:</strong> ${metadata.data.creator}</p>
+                    <img src="https://ipfs.io/ipfs/${metadata.data.image}" alt="NFT Image" width="200" />
+                    <button onclick="buyNFT(${nft.tokenId}, '${nft.price}')">Buy</button>
+                    <hr />
+                  `;
+
+                  marketplaceDiv.appendChild(nftItem);
+                } else {
+                  console.error("Error fetching token URI", tokenURIResponse);
+                }
+              });
+            }
+          } else {
+            alert("Error fetching unsold NFTs.");
+          }
+        } catch (error) {
+          console.error(error);
+          alert("Error fetching unsold NFTs. Check the console for details.");
+        }
+      }
+
+      // Buy NFT
+      async function buyNFT(tokenId, price) {
+        if (!userAccount) {
+          alert("Please connect to MetaMask first.");
+          return;
+        }
+
+        const weiPrice = web3.utils.toWei(price, "ether");
+
+        try {
+          const response = await axios.post(
+            "https://blockchain-tul0.onrender.com/api/marketplace/buy-item",
+            {
+              tokenId: tokenId,
+              price: price,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (response.data.success) {
+            alert("NFT purchased successfully!");
+            // Refresh the marketplace after purchase
+            fetchUnsoldNFTs();
+          } else {
+            alert("Error purchasing NFT.");
+          }
+        } catch (error) {
+          console.error(error);
+          alert("Error purchasing NFT. Check the console for details.");
+        }
+      }
+    </script>
+  </body>
+</html>

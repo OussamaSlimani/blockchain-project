@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My NFTs</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <h1>Your NFTs</h1>
+
+    <!-- Connect to MetaMask Button -->
+    <button id="connectButton">Connect to MetaMask</button>
+    <p id="accountInfo"></p>
+
+    <!-- Fetch NFTs Button -->
+    <button id="fetchMyNFTs" disabled>Fetch My NFTs</button>
+    <div id="nftList"></div>
+
+    <!-- Message Display Area -->
+    <div id="messageDiv" style="margin-top: 20px"></div>
+
+    <script>
+      let userAccount = null;
+      let web3 = null;
+
+      // Connect to MetaMask
+      document
+        .getElementById("connectButton")
+        .addEventListener("click", async () => {
+          if (window.ethereum) {
+            try {
+              const accounts = await ethereum.request({
+                method: "eth_requestAccounts",
+              });
+              userAccount = accounts[0];
+              document.getElementById(
+                "accountInfo"
+              ).innerText = `Connected: ${userAccount}`;
+
+              // Initialize Web3
+              web3 = new Web3(window.ethereum);
+
+              // Enable the Fetch My NFTs button after connecting
+              document.getElementById("fetchMyNFTs").disabled = false;
+            } catch (error) {
+              console.error("User denied account access", error);
+            }
+          } else {
+            alert(
+              "MetaMask is not installed. Please install it to use this feature."
+            );
+          }
+        });
+
+      // Fetch NFTs owned by the user
+      document
+        .getElementById("fetchMyNFTs")
+        .addEventListener("click", async () => {
+          if (!userAccount) {
+            document.getElementById("messageDiv").innerHTML =
+              "<p style='color: red;'>Please connect to MetaMask first.</p>";
+            return;
+          }
+
+          try {
+            const response = await axios.get(
+              `https://blockchain-tul0.onrender.com/api/marketplace/my-nfts/${userAccount}`
+            );
+
+            if (response.data.success) {
+              const myNFTs = response.data.myNFTs;
+              const nftList = document.getElementById("nftList");
+
+              nftList.innerHTML = ""; // Clear previous results
+
+              if (myNFTs.length === 0) {
+                nftList.innerHTML = "<p>You don't own any NFTs yet.</p>";
+              } else {
+                myNFTs.forEach(async (nft) => {
+                  const tokenURIResponse = await axios.get(
+                    `https://blockchain-tul0.onrender.com/api/marketplace/token-uri/${nft.tokenId}`
+                  );
+
+                  if (tokenURIResponse.data.success) {
+                    const tokenURI = tokenURIResponse.data.tokenURI;
+                    const ipfsUrl = `https://ipfs.io/ipfs/${tokenURI}`;
+
+                    // Fetch NFT metadata from IPFS
+                    const metadata = await axios.get(ipfsUrl);
+                    const nftItem = document.createElement("div");
+
+                    nftItem.innerHTML = `
+                      <p><strong>Token ID:</strong> ${nft.tokenId}</p>
+                      <p><strong>Seller:</strong> ${nft.seller}</p>
+                      <p><strong>Owner:</strong> ${nft.owner}</p>
+                      <p><strong>Price:</strong> ${nft.price} ETH</p>
+                      <p><strong>Sold:</strong> ${nft.sold ? "Yes" : "No"}</p>
+                      <p><strong>Name:</strong> ${metadata.data.name}</p>
+                      <p><strong>Description:</strong> ${
+                        metadata.data.description
+                      }</p>
+                      <p><strong>Creator:</strong> ${metadata.data.creator}</p>
+                      <img src="https://ipfs.io/ipfs/${
+                        metadata.data.image
+                      }" alt="NFT Image" width="200" />
+                      <input type="number" id="price-${
+                        nft.tokenId
+                      }" placeholder="Set price in ETH" step="0.01" />
+                      <button onclick="listForSale(${
+                        nft.tokenId
+                      })">List for Sale</button>
+                      <hr />
+                    `;
+
+                    nftList.appendChild(nftItem);
+                  } else {
+                    console.error("Error fetching token URI", tokenURIResponse);
+                  }
+                });
+              }
+            } else {
+              document.getElementById("messageDiv").innerHTML =
+                "<p style='color: red;'>Error fetching NFTs.</p>";
+            }
+          } catch (error) {
+            console.error(error);
+            document.getElementById("messageDiv").innerHTML =
+              "<p style='color: red;'>Error fetching NFTs. Check the console for details.</p>";
+          }
+        });
+
+      // List NFT for Sale
+      async function listForSale(tokenId) {
+        const priceInput = document.getElementById(`price-${tokenId}`);
+        const price = parseFloat(priceInput.value);
+
+        const messageDiv = document.getElementById("messageDiv");
+        if (!price || price <= 0) {
+          messageDiv.innerHTML =
+            "<p style='color: red;'>Please enter a valid price.</p>";
+          return;
+        }
+
+        try {
+          messageDiv.innerHTML = "<p>Listing NFT for sale...</p>";
+          const response = await axios.post(
+            "https://blockchain-tul0.onrender.com/api/marketplace/list-item",
+            {
+              tokenId: tokenId,
+              price: price,
+              seller: userAccount,
+            }
+          );
+
+          if (response.data.success) {
+            messageDiv.innerHTML =
+              "<p style='color: green;'>NFT listed for sale successfully!</p>";
+          } else {
+            messageDiv.innerHTML =
+              "<p style='color: red;'>Error listing NFT for sale.</p>";
+          }
+        } catch (error) {
+          console.error(error);
+          messageDiv.innerHTML =
+            "<p style='color: red;'>Error listing NFT for sale. Check the console for details.</p>";
+        }
+      }
+    </script>
+  </body>
+</html>

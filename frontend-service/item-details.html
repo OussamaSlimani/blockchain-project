@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Funto - HTML NFT Marketplace" />
+    <!-- Title-->
+    <title>Funto - HTML NFT Marketplace</title>
+    <!-- Favicon-->
+    <link
+      rel="shortcut icon"
+      href="img/core-img/favicon.ico"
+      type="image/x-icon"
+    />
+    <!-- All CSS Stylesheet-->
+    <link rel="stylesheet" href="css/all-css-libraries.css" />
+    <!-- Core Stylesheet-->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Include web3.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <!-- Include axios from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Link to external JavaScript file -->
+    <script src="blockchain/wallet.js" defer></script>
+    <script src="blockchain/fetchNFTDetails.js" defer></script>
+  </head>
+  <body>
+    <!-- Preloader-->
+    <div class="preloader" id="preloader">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <!-- Header Area-->
+    <header class="header-area">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <!-- Navbar Brand --><a class="navbar-brand" href="index.html"
+            ><img class="light-logo" src="img/core-img/logo.png" alt="" /><img
+              class="dark-logo"
+              src="img/core-img/logo-white.png"
+              alt=""
+          /></a>
+          <!-- Navbar Toggler -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#funtoNav"
+            aria-controls="funtoNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <i class="bi bi-grid"></i>
+          </button>
+          <!-- Navbar -->
+          <div class="collapse navbar-collapse" id="funtoNav">
+            <ul class="navbar-nav navbar-nav-scroll my-2 my-lg-0">
+              <li>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <a href="create-new.html">Create</a>
+              </li>
+              <li>
+                <a href="my-nft.html">My NFT</a>
+              </li>
+            </ul>
+            <!-- Connect to wallet button -->
+            <!-- Connect to wallet button -->
+            <div class="header-meta d-flex align-items-center ms-lg-auto">
+              <span
+                class="wallet-address text-white p-2"
+                id="walletAddress"
+              ></span>
+              <a class="btn btn-warning btn-sm rounded-pill" id="walletButton"
+                >Connect to wallet</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-wrapper">
+      <div class="container">
+        <div class="breadcrumb-content">
+          <h2 class="breadcrumb-title">Item Details</h2>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center">
+              <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">
+                Item Details
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <!-- Share Modal -->
+    <div
+      class="share-modal modal fade"
+      id="shareModal"
+      tabindex="-1"
+      aria-labelledby="shareModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body p-4 text-center">
+            <h4 class="mb-4" id="shareModalLabel">Share this item</h4>
+            <div class="d-flex align-items-center justify-content-center">
+              <a class="mx-2" href="#"
+                ><img src="img/core-img/icons8-facebook.svg" alt="" /></a
+              ><a class="mx-2" href="#"
+                ><img src="img/core-img/icons8-twitter.svg" alt="" /></a
+              ><a class="mx-2" href="#"
+                ><img src="img/core-img/icons8-instagram.svg" alt="" /></a
+              ><a class="mx-2" href="#"
+                ><img src="img/core-img/icons8-slack.svg" alt="" /></a
+              ><a class="mx-2" href="#"
+                ><img src="img/core-img/icons8-player.svg" alt=""
+              /></a>
+            </div>
+            <button
+              class="btn btn-danger btn-sm rounded-pill mt-4"
+              type="button"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="me-1 bi bi-x-lg"></i>Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Copy Link Modal -->
+    <div
+      class="share-modal modal fade"
+      id="copylinkModal"
+      tabindex="-1"
+      aria-labelledby="copylinkLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body p-4 text-center">
+            <h4 class="mb-4" id="copylinkLabel">Copy item link</h4>
+            <p class="user-select-all mb-0 border border-2 p-3 rounded">
+              https://themeforest.net/item/affan-pwa-mobile-html-template/29715548
+            </p>
+            <button
+              class="btn btn-danger btn-sm rounded-pill mt-4"
+              type="button"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="me-1 bi bi-x-lg"></i>Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Report Modal -->
+    <div
+      class="share-modal modal fade"
+      id="reportModal"
+      tabindex="-1"
+      aria-labelledby="reportModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body p-4 text-center">
+            <h4 class="mb-4" id="reportModalLabel">Why are you reporting?</h4>
+            <form action="#">
+              <textarea
+                class="form-control mb-3"
+                id="reportText"
+                name="reportMessage"
+                placeholder="Write your complaint..."
+              ></textarea>
+              <div class="d-flex align-items-center justify-content-between">
+                <button
+                  class="btn btn-danger btn-sm rounded-pill"
+                  type="button"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <i class="me-1 bi bi-x-lg"></i>Close
+                </button>
+                <button
+                  class="btn btn-primary btn-sm rounded-pill"
+                  type="submit"
+                >
+                  Report
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Item Details -->
+    <!--=====================-->
+    <div class="item-details-wrap">
+      <div class="container">
+        <div class="row g-4 g-lg-5 justify-content-center">
+          <div class="col-12 col-md-12 col-lg-6">
+            <div class="item-big-thumb">
+              <img id="nftImage" src="" alt="NFT Image" data-action="zoom" />
+            </div>
+          </div>
+          <!-- Item Details Content -->
+          <div class="col-12 col-md-9 col-lg-6">
+            <div class="item-details-content mt-5 mt-lg-0">
+              <h2 id="nftTitle" class="my-3">Loading...</h2>
+              <div class="d-flex align-items-center mb-4">
+                <div class="name-author">
+                  <span class="d-block fz-14">Created by</span>
+                  <p
+                    id="nftCreator"
+                    class="author d-block fz-16 hover-primary text-truncate"
+                  >
+                    Loading...
+                  </p>
+                </div>
+              </div>
+              <div class="border-top w-75 mb-4"></div>
+              <!-- Bid End -->
+              <div class="row align-items-end">
+                <div class="col-6 col-sm-4">
+                  <p class="mb-2">Price</p>
+                  <h5
+                    id="nftPrice"
+                    class="text-center mb-0 border border-2 px-3 py-2 border-primary d-inline-block rounded text-primary w-100"
+                  >
+                    Loading...
+                  </h5>
+                </div>
+                <div class="col-6 col-sm-4 col-lg-5">
+                  <button
+                    id="buyButton"
+                    class="btn btn-primary rounded-pill w-100"
+                    onclick="buyNFT()"
+                    disabled
+                  >
+                    Loading...
+                  </button>
+                </div>
+              </div>
+              <div class="border-top w-75 my-4"></div>
+              <div class="short-description">
+                <h5>Description</h5>
+                <p id="nftDescription" class="mb-0">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--=====================-->
+    <div class="divider"></div>
+    <!-- Dark Light Wrapper -->
+    <div
+      class="dark-light-wrapper"
+      data-aos="zoom-in"
+      data-aos-duration="750"
+      data-aos-delay="200"
+    >
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <h5
+            class="mb-0 text-white"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="500"
+          >
+            Light mode is available!
+          </h5>
+          <!-- Switch -->
+          <div
+            class="dark-light-mode"
+            data-aos="fade-up"
+            data-aos-duration="750"
+            data-aos-delay="800"
+          >
+            <input id="darkLightSwitch" type="checkbox" />
+            <label class="shadow" for="darkLightSwitch">Toggle</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer-area text-center py-4">
+      <div class="container">
+        <p>&copy; <span id="year"></span> My NFT Marketplace.</p>
+      </div>
+    </footer>
+    <!-- Scroll To Top -->
+    <div id="scrollTopButton"><i class="bi bi-arrow-up-short"></i></div>
+    <!-- All JavaScript Files-->
+    <script src="js/all-js-libraries.js"></script>
+    <script src="js/active.js"></script>
+    <script src="js/charts.js"></script>
+  </body>
+</html>
