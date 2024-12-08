@@ -147,16 +147,16 @@ async function listForSale(tokenId) {
     );
 
     if (response.data.success) {
-      messageDiv.innerHTML =
-        "<p style='color: green;'>NFT listed for sale successfully!</p>";
+      // Redirect to listed.html on successful listing
+      window.location.href = "listed.html";
     } else {
-      messageDiv.innerHTML =
-        "<p style='color: red;'>Error listing NFT for sale.</p>";
+      // Redirect to 500.html if there is an error
+      window.location.href = "500.html";
     }
   } catch (error) {
     console.error(error);
-    messageDiv.innerHTML =
-      "<p style='color: red;'>Error listing NFT for sale. Check the console for details.</p>";
+    // Redirect to 500.html if there's an exception or error
+    window.location.href = "500.html";
   }
 }
 

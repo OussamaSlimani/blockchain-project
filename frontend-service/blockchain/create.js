@@ -1,29 +1,25 @@
 let userAccount = null;
 let web3 = null;
 
-// Connect to MetaMask
-window.addEventListener("load", () => {
-  if (window.ethereum) {
-    window.ethereum
-      .request({ method: "eth_requestAccounts" })
-      .then((accounts) => {
-        userAccount = accounts[0];
-        console.log("Connected to MetaMask:", userAccount);
-        web3 = new Web3(window.ethereum);
-      })
-      .catch((error) => {
-        console.error("Error connecting to MetaMask", error);
-        alert("Please install MetaMask to continue.");
-      });
-  } else {
-    alert("MetaMask is not installed. Please install it to use this feature.");
-  }
-});
+// Check if wallet is connected before proceeding
+const isWalletConnected = localStorage.getItem("walletConnected") === "true";
+const walletAddress = localStorage.getItem("walletAddress");
+
+// If wallet is connected, use the address; otherwise, prompt the user to connect
+if (isWalletConnected) {
+  userAccount = walletAddress;
+  console.log("Wallet is connected: " + userAccount);
+  web3 = new Web3(window.ethereum); // Initialize web3
+} else {
+  alert("Please connect your wallet to create an NFT.");
+  // Optionally, you can show a more user-friendly message in the UI
+}
 
 // Handle NFT Form Submission
 document.getElementById("nftForm").addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  // Ensure wallet is connected before submitting the form
   if (!userAccount) {
     alert("Please connect to MetaMask first.");
     return;
