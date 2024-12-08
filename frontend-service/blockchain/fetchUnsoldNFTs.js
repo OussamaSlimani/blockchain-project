@@ -104,14 +104,7 @@ function renderNFTs(nfts) {
                </div>
                <div class="row gx-2 align-items-center mt-3">
                  <div class="col-6">
-                   <a class="btn btn-primary btn-sm rounded-pill" href="#">Buy now</a>
-                 </div>
-                 <div class="col-6 text-end">
-                   <button 
-                     class="btn btn-minimal btn-sm hover-primary" 
-                     onclick="viewNFTDetails(${nft.tokenId})">
-                     <i class="bi bi-activity me-1"></i>Details
-                   </button>
+                   <a class="btn btn-primary btn-sm rounded-pill" onclick="viewNFTDetails(${nft.tokenId})">Details</a>
                  </div>
                </div>
              </div>

@@ -25,29 +25,26 @@ document.getElementById("nftForm").addEventListener("submit", async (event) => {
     return;
   }
 
-  const formData = new FormData();
   const nftName = document.getElementById("nftName").value;
   const nftDescription = document.getElementById("nftDescription").value;
   const nftCreator = document.getElementById("nftCreator").value;
   const nftFile = document.getElementById("nftFile").files[0];
 
-  // Add the file and metadata to the form data
-  formData.append("file", nftFile);
-  formData.append(
-    "metadata",
-    JSON.stringify({
-      name: nftName,
-      description: nftDescription,
-      creator: nftCreator,
-    })
-  );
+  if (!nftFile) {
+    alert("Please select an image file to create an NFT.");
+    return;
+  }
 
   // Display status
-  document.getElementById("status").innerText = "Uploading...";
+  document.getElementById("status").innerText = "Checking for plagiarism...";
 
   try {
-    const response = await axios.post(
-      "https://blockchain-tul0.onrender.com/api/marketplace/create-token",
+    // Step 1: Check for plagiarism using Flask API
+    const formData = new FormData();
+    formData.append("image", nftFile);
+
+    const plagiarismResponse = await axios.post(
+      "http://127.0.0.1:5000/check_plagiarism", // Update this URL if your Flask API is hosted elsewhere
       formData,
       {
         headers: {
@@ -56,12 +53,43 @@ document.getElementById("nftForm").addEventListener("submit", async (event) => {
       }
     );
 
-    document.getElementById(
-      "status"
-    ).innerText = `NFT Created! Transaction Hash: ${response.data.transactionHash}`;
+    if (plagiarismResponse.data.message === "Plagiarism detected") {
+      // Redirect to plagiarism.html if plagiarism is detected
+      window.location.href = "plagiarism.html";
+      return;
+    }
+
+    // Step 2: Proceed with NFT creation if no plagiarism detected
+    document.getElementById("status").innerText =
+      "No plagiarism detected. Creating NFT...";
+
+    const nftFormData = new FormData();
+    nftFormData.append("file", nftFile);
+    nftFormData.append(
+      "metadata",
+      JSON.stringify({
+        name: nftName,
+        description: nftDescription,
+        creator: nftCreator,
+      })
+    );
+
+    const nftResponse = await axios.post(
+      "https://blockchain-tul0.onrender.com/api/marketplace/create-token",
+      nftFormData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Redirect to create-nft.html on successful NFT creation
+    document.getElementById("status").innerText = "NFT created successfully!";
+    window.location.href = "create-nft.html";
   } catch (error) {
     console.error(error);
     document.getElementById("status").innerText =
-      "Error creating NFT. Check console for details.";
+      "Error during plagiarism check or NFT creation. Check console for details.";
   }
 });
