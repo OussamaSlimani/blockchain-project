@@ -71,7 +71,8 @@ def check_image():
     if "image" not in request.files:
         return jsonify({"error": "No image file provided"}), 400
     
-    image_file = request.files["image"]
+    image_file = request.files["image"]   
+
     img_path = f"uploads/{image_file.filename}"
     os.makedirs("uploads", exist_ok=True)
     image_file.save(img_path)

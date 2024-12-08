@@ -36,33 +36,10 @@ document.getElementById("nftForm").addEventListener("submit", async (event) => {
   }
 
   // Display status
-  document.getElementById("status").innerText = "Checking for plagiarism...";
+  document.getElementById("status").innerText = "Creating NFT...";
 
   try {
-    // Step 1: Check for plagiarism using Flask API
-    const formData = new FormData();
-    formData.append("image", nftFile);
-
-    const plagiarismResponse = await axios.post(
-      "http://127.0.0.1:5000/check_plagiarism", // Update this URL if your Flask API is hosted elsewhere
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    if (plagiarismResponse.data.message === "Plagiarism detected") {
-      // Redirect to plagiarism.html if plagiarism is detected
-      window.location.href = "plagiarism.html";
-      return;
-    }
-
-    // Step 2: Proceed with NFT creation if no plagiarism detected
-    document.getElementById("status").innerText =
-      "No plagiarism detected. Creating NFT...";
-
+    // Proceed directly with NFT creation
     const nftFormData = new FormData();
     nftFormData.append("file", nftFile);
     nftFormData.append(
@@ -90,6 +67,6 @@ document.getElementById("nftForm").addEventListener("submit", async (event) => {
   } catch (error) {
     console.error(error);
     document.getElementById("status").innerText =
-      "Error during plagiarism check or NFT creation. Check console for details.";
+      "Error during NFT creation. Check console for details.";
   }
 });
