@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import os
 import json
 import numpy as np
@@ -65,6 +65,11 @@ def check_similarity(new_features, existing_features, threshold=0.9):
     existing_features_array = np.array(existing_features)
     similarity = cosine_similarity([new_features], existing_features_array)
     return np.any(similarity >= threshold)
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 
 @app.route("/check", methods=["POST"])
 def check_image():
