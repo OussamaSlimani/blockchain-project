@@ -1,101 +1,120 @@
 from flask import Flask, request, jsonify, render_template
-import os
+import torch
+import torchvision.transforms as transforms
+from torchvision import models
+from PIL import Image
 import json
 import numpy as np
-from tensorflow.keras.applications import MobileNetV2
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.layers import GlobalAveragePooling2D
-from tensorflow.keras.models import Model
-from tensorflow.keras import Input
-from sklearn.metrics.pairwise import cosine_similarity
+from scipy.spatial.distance import cosine
+import os
 
-# Flask app
 app = Flask(__name__)
 
-# Define paths
-FEATURES_FILE = "features.json"
-LOCAL_WEIGHTS_PATH = "mobilenet_v2_weights_tf_dim_ordering_tf_kernels_1.0_224_no_top.h5"
-FEATURE_DIM = 1280  # Feature vector size for MobileNetV2
+# Load the ResNet-18 model pre-trained on ImageNet with updated weights
+from torchvision.models import ResNet18_Weights
 
-# Load MobileNetV2 model from local weights
-def load_model_from_local_weights(weights_path):
-    """Load MobileNetV2 with local weights."""
-    base_model = MobileNetV2(
-        weights=None, include_top=False, input_tensor=Input(shape=(224, 224, 3))
-    )
-    base_model.load_weights(weights_path)
-    # Add global average pooling
-    x = GlobalAveragePooling2D()(base_model.output)
-    model = Model(inputs=base_model.input, outputs=x)
-    return model
+model = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+model.eval()  # Set the model to evaluation mode
 
-model = load_model_from_local_weights(LOCAL_WEIGHTS_PATH)
+# Define a transformation to preprocess the image
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
 
-def load_or_initialize_features(file_path):
-    """Load features from a JSON file or initialize an empty structure."""
-    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-        with open(file_path, "r") as f:
-            data = json.load(f)
-            # Validate feature dimensions
-            if all(len(feature) == FEATURE_DIM for feature in data):
-                return data
-            else:
-                print("Dimension mismatch in features.json. Reinitializing.")
-                return []
-    return []
+# Function to extract features from an image
+def extract_features(image_path):
+    image = Image.open(image_path)
 
-def save_features(file_path, features):
-    """Save features to a JSON file."""
-    with open(file_path, "w") as f:
-        json.dump(features, f)
+    # If the image has an alpha channel (RGBA), convert it to RGB
+    if image.mode == 'RGBA':
+        image = image.convert('RGB')
+    elif image.mode == 'L':  # If the image is grayscale, convert it to RGB
+        image = image.convert('RGB')
 
-def extract_features(img_path):
-    """Extract features from an image using MobileNetV2."""
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 127.5 - 1.0  # Normalize as per MobileNetV2 preprocessing
-    features = model.predict(img_array)
-    return features.flatten().tolist()
+    # Apply transformations
+    image = transform(image).unsqueeze(0)  # Add batch dimension
+    with torch.no_grad():  # Disable gradient computation for inference
+        features = model(image)
+    
+    # Use the output of the penultimate layer (before final classification layer)
+    return features.squeeze().numpy()  # Convert tensor to numpy array
 
-def check_similarity(new_features, existing_features, threshold=0.9):
-    """Check if the new features have similarity >= threshold with any existing features."""
-    if not existing_features:
-        return False
-    existing_features_array = np.array(existing_features)
-    similarity = cosine_similarity([new_features], existing_features_array)
-    return np.any(similarity >= threshold)
+# Function to calculate cosine similarity between two feature vectors
+def cosine_similarity(feature1, feature2):
+    return 1 - cosine(feature1, feature2)
+
+# Function to check and store new features in features.json
+def check_and_store_features(image_path, features_file='features.json'):
+    # Extract features from the new image
+    new_features = extract_features(image_path)
+    
+    # Load existing features from the JSON file
+    stored_features = []
+
+    try:
+        with open(features_file, 'r') as f:
+            stored_features = json.load(f)
+    except FileNotFoundError:
+        # If the file does not exist, initialize it with an empty list
+        stored_features = []
+    except json.JSONDecodeError:
+        # If there is an error in decoding (file is empty or corrupt), initialize with an empty list
+        print(f"Warning: {features_file} is empty or corrupt. Initializing with an empty list.")
+        stored_features = []
+
+    # Compare the new features with stored ones
+    for stored_feature in stored_features:
+        similarity = cosine_similarity(new_features, np.array(stored_feature))
+        if similarity >= 0.9:
+            print("Plagiarism detected.")
+            return True  # Return True if plagiarism is detected
+    
+    # If no match found, store the new features in the JSON file
+    stored_features.append(new_features.tolist())  # Store as a list of lists
+    with open(features_file, 'w') as f:
+        json.dump(stored_features, f)
+    print("New features added.")
+    return False  # No plagiarism
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
-@app.route("/check", methods=["POST"])
-def check_image():
-    if "image" not in request.files:
+# API to upload image and check for plagiarism
+@app.route('/check_plagiarism', methods=['POST'])
+def check_plagiarism():
+    if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
-    
-    image_file = request.files["image"]   
 
-    img_path = f"uploads/{image_file.filename}"
-    os.makedirs("uploads", exist_ok=True)
-    image_file.save(img_path)
+    image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
 
-    # Load existing features
-    existing_features = load_or_initialize_features(FEATURES_FILE)
+    # Save the uploaded image temporarily
+    image_path = os.path.join('uploads', image_file.filename)
+    os.makedirs('uploads', exist_ok=True)
+    image_file.save(image_path)
 
-    # Extract features from the input image
-    new_features = extract_features(img_path)
+    # Check for plagiarism
+    plagiarism_detected = check_and_store_features(image_path)
 
-    # Check similarity
-    if check_similarity(new_features, existing_features):
+    if plagiarism_detected:
         return jsonify({"message": "Plagiarism detected"}), 200
     else:
-        # Add to database
-        existing_features.append(new_features)
-        save_features(FEATURES_FILE, existing_features)
-        return jsonify({"message": "No plagiarism detected. Features added to database."}), 200
+        return jsonify({"message": "No plagiarism detected, features stored"}), 200
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+# API to retrieve stored features (optional, for testing)
+@app.route('/stored_features', methods=['GET'])
+def stored_features():
+    try:
+        with open('features.json', 'r') as f:
+            features = json.load(f)
+        return jsonify(features), 200
+    except FileNotFoundError:
+        return jsonify({"message": "No stored features found."}), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)

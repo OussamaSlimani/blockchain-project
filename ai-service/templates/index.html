@@ -72,7 +72,6 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="collapse navbar-collapse" id="funtoNav">
         <ul class="navbar-nav navbar-nav-scroll my-2 my-lg-0 p-2 fs-20">
-          <!-- Changed fs-16 to fs-20 -->
           <li class="nav-item">
             <a class="nav-link" href="index.html">Home</a>
           </li>
@@ -148,7 +147,8 @@
             "Processing... Please wait.";
 
           try {
-            const response = await fetch("/check", {
+            const response = await fetch("/check_plagiarism", {
+              // Updated to match the Flask route
               method: "POST",
               body: formData,
             });
@@ -156,7 +156,7 @@
 
             // Change status message based on plagiarism result
             if (response.ok) {
-              if (result.isPlagiarised) {
+              if (result.message === "Plagiarism detected") {
                 // Plagiarism detected
                 document.getElementById("statusMessage").textContent =
                   "Plagiarism detected. Redirecting...";
